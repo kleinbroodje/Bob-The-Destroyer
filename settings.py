@@ -11,7 +11,7 @@ display = pygame.Surface((screen_width, screen_height))
 pygame.display.set_caption("Bob The Destroyer")
 scroll = [0, 0]
 
-bg = pygame.image.load("sprites/forest.png")
+bg = pygame.image.load("sprites/forest.png").convert()
 bg = pygame.transform.scale(bg, (850, 700))
 
 player_x = 0
@@ -19,10 +19,10 @@ player_y = 490
 player_speed = 6
 
 #spritesheets
-player_sheet = pygame.image.load("sprites/Bob_The_Destroyer.png")
-guns_sheet = pygame.image.load("sprites/Guns and Ammo.png")
-eye_floating_sheet = pygame.image.load("sprites/eye_floating.png")
-frog_sheet = pygame.image.load("sprites/Frog.png")
+player_sheet = pygame.image.load("sprites/Bob_The_Destroyer.png").convert()
+guns_sheet = pygame.image.load("sprites/Guns and Ammo.png").convert()
+eye_floating_sheet = pygame.image.load("sprites/eye_floating.png").convert()
+frog_sheet = pygame.image.load("sprites/Frog.png").convert()
 
 #function for getting frames from spritesheet
 def get_image(sheet, frame,  width, height, scale, colorkey):
@@ -76,7 +76,7 @@ bg_music = pygame.mixer.Sound("sfx/bg_music.mp3")
 gun = "ar"
 
 #tiles
-tiles_sheet = pygame.image.load("sprites/tiles.png")
+tiles_sheet = pygame.image.load("sprites/tiles.png").convert()
 tiles = []
 tile_size = 32
 scale = 1
