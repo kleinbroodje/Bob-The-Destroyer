@@ -20,7 +20,7 @@ class Player:
         self.offset_x = self.rect.x
         self.jumping = False
         self.touching_ground = False
-        self.vel_y = 0
+        self.vel_y = 15
 
     def update(self):
         global gravity
@@ -66,16 +66,21 @@ class Player:
             elif jumping == False:
                 self.image = idle_bob
             self.running_frame = 0
+        
+        self.rect.y += gravity
+
+        for t in tile_rects:
+            if t.colliderect(self.rect):
+                player.rect.bottom = t.top
+                jumping = False
+                self.vel_y = 15
 
         if key[pygame.K_w]:
             jumping = True
 
         if jumping:
-            self.vel_y -= 10
-
-        for t in tile_rects:
-            if t.colliderect(self.rect):
-                print(1)
+            self.rect.y -= self.vel_y
+            self.vel_y -= 1
 
         if jumping == True and self.flip == False:
             self.image = jumping_bob
@@ -83,6 +88,7 @@ class Player:
         elif jumping == True and self.flip:
             self.image = pygame.transform.flip(jumping_bob, True, False)
 
+        print(jumping)
         display.blit(self.image, (self.rect.x - scroll[0], self.rect.y))
 
 #bullet class
@@ -278,7 +284,7 @@ frogs = [Frog(200, 473)]
 #screenshake
 screenshake = 0
 
-gravity = 10
+gravity = 1
 jumping = False
 
 #music
