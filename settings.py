@@ -19,10 +19,10 @@ player_y = 490
 player_speed = 6
 
 #spritesheets
-player_sheet = pygame.image.load("sprites/Bob_The_Destroyer.png").convert()
-guns_sheet = pygame.image.load("sprites/Guns and Ammo.png").convert()
+player_sheet = pygame.image.load("sprites/bob_the_destroyer.png").convert()
+guns_sheet = pygame.image.load("sprites/guns and ammo.png").convert()
 eye_floating_sheet = pygame.image.load("sprites/eye_floating.png").convert()
-frog_sheet = pygame.image.load("sprites/Frog.png").convert()
+frog_sheet = pygame.image.load("sprites/frog.png").convert()
 
 #function for getting frames from spritesheet
 def get_image(sheet, frame,  width, height, scale, colorkey):
