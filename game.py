@@ -20,7 +20,9 @@ class Player:
         self.offset_x = self.rect.x
         self.jumping = False
         self.touching_ground = False
-        self.vel_y = 15
+        self.jump_height = 15
+        self.vel_y = 0
+        self.in_air = False
 
     def update(self):
         global gravity
@@ -66,27 +68,26 @@ class Player:
             elif jumping == False:
                 self.image = idle_bob
             self.running_frame = 0
-        
-        self.rect.y += gravity
+
+        self.vel_y -= gravity
+        self.rect.y -= self.vel_y
 
         for t in tile_rects:
             if t.colliderect(self.rect):
-                player.rect.bottom = t.top
+                self.rect.bottom = t.top
                 jumping = False
-                self.vel_y = 15
+                self.vel_y = 0
 
-        if key[pygame.K_w]:
+        if key[pygame.K_w] and not jumping:
+            self.vel_y = self.jump_height
             jumping = True
-
-        if jumping:
-            self.rect.y -= self.vel_y
-            self.vel_y -= 1
-
+    
         if jumping == True and self.flip == False:
             self.image = jumping_bob
 
         elif jumping == True and self.flip:
-            self.image = pygame.transform.flip(jumping_bob, True, False)
+            self.image = pygame.transform.flip(jumping_bob, True, False)   
+    
 
         display.blit(self.image, (self.rect.x - scroll[0], self.rect.y))
 
@@ -143,6 +144,7 @@ class Bullet:
         #removing bullet if outside of screen
         if (self.rect.x > screen_width + scroll[0]) or (self.rect.x < 0 + scroll[0]):
             bullets.remove(self)
+
         for f in frogs:
             if self.rect.colliderect(f.rect):
                 f.hp_bar.hp -= 35
@@ -278,7 +280,7 @@ ar_cooldown = 100
 sg_cooldown = 1700
 
 #Frog
-frogs = [Frog(200, 473)]
+frogs = [Frog(200, 463)]
 
 #screenshake
 screenshake = 0
@@ -361,7 +363,7 @@ while running:
                 bullets.append(Bullet(gun))
                 pygame.mixer.Channel(1).play(gun_sound)
                 last_bullet = current_time
-                screenshake = 20
+                screenshake = 15
 
     #screenshake 
     if screenshake > 0:
@@ -393,7 +395,7 @@ while running:
         b.update()
     
     if frogs == []:
-        frogs.append(Frog(random.randint(0, 640), 473))
+        frogs.append(Frog(random.randint(0, 640), 463))
 
     screen.blit(pygame.transform.scale(display, (screen_width, screen_height)), render_offset) #display is blitted on surface 
     pygame.display.update()
