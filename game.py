@@ -22,7 +22,6 @@ class Player:
         self.touching_ground = False
         self.jump_height = 15
         self.vel_y = 0
-        self.in_air = False
 
     def update(self):
         global gravity
