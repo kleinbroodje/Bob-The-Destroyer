@@ -1,11 +1,9 @@
 import pygame
 import random
 import threading
-import time
 from settings import *
 
 pygame.init()
-
 
 class Player:
     def __init__(self, x, y, speed):
@@ -104,6 +102,9 @@ class Bullet:
         self.type = type
 
     def update(self):
+        global hp_bar_last_update
+        global current_time
+
         #blitting and moving bullet if type is assault rifle
         if self.type == "ar":
             display.blit(self.image, (self.rect.x - 20 - scroll [0] if self.flip else self.rect.x + 10 - scroll[0], self.rect.y))
@@ -116,31 +117,32 @@ class Bullet:
         if self.type == "sg1":
             display.blit(self.image, (self.rect.x - 20 - scroll[0] if self.flip else self.rect.x + 10 - scroll[0], self.rect.y - 1))
             if self.flip:
-                self.rect.x -= 15 
+                self.rect.x -= 20
             else:
-                self.rect.x += 15
-            self.rect.y -= 1
+                self.rect.x += 20
+            self.rect.y -= 1.9
         if self.type == "sg2":
             display.blit(self.image, (self.rect.x - 20 - scroll[0] if self.flip else self.rect.x + 10 - scroll[0], self.rect.y - 1))
             if self.flip:
-                self.rect.x -= 15
+                self.rect.x -= 20
             else:
-                self.rect.x += 15
+                self.rect.x += 20
         if self.type == "sg3":
             display.blit(self.image, (self.rect.x - 20 - scroll[0] if self.flip else self.rect.x + 10 - scroll[0], self.rect.y - 1))
             if self.flip:
-                self.rect.x -= 15
+                self.rect.x -= 20
             else:
-                self.rect.x += 15
-            self.rect.y += 1.5
+                self.rect.x += 20
+            self.rect.y += 2.5
 
         #removing bullet if outside of screen
         if self.rect.x > screen_width or self.rect.x < 0:
             bullets.remove(self)
         for f in frogs:
-            if self.rect.colliderect(f):
+            if self.rect.colliderect(f.rect):
                 f.hp_bar.hp -= 35
                 f.show_hp = True
+                hp_bar_last_update = current_time
                 bullets.remove(self)
 
 
@@ -206,6 +208,9 @@ class Frog:
         self.show_hp = False
 
     def update(self):
+        global hp_bar_last_update
+        global current_time
+
         croak = 0
         if croak != 1:
             croak = random.randint(0, 500)
@@ -237,12 +242,14 @@ class Frog:
                     pygame.mixer.Channel(3).play(death_sound)
                     frogs.remove(self)
 
-        hp_bar_show = threading.Thread(target=show_hp_bar, args=(self, ), daemon=True)
+        if self.show_hp:
+            self.hp_bar.draw() 
 
-        if self.show_hp and self.hp_bar.hp > 0:
-            hp_bar_show.start()
+        if current_time - hp_bar_last_update >= 1000:  
+            self.show_hp = False
 
         display.blit(self.image, (self.rect.x -15 - scroll[0], self.rect.y - 15))
+        
 
 class Platform:
     def __init__(self, x, y, width, height, color):
@@ -257,14 +264,6 @@ class Platform:
         pass
     def draw(self):
         pygame.draw.rect(display, self.color, ((self.rect.x - scroll[0]), self.rect.y, self.rect.width, self.rect.height))
-
-def show_hp_bar(self):
-    print(1)
-    self.hp_bar.draw()
-    time.sleep(1)
-    print(2)
-    self.show_hp = False
-    print(3)
 
 
 #bullets

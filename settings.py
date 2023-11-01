@@ -65,6 +65,8 @@ running_last_update = 0
 for x in range(1, 6):
     running_bob.append(get_image(player_sheet, x, 12, 14, 4, (0, 0, 0)))
 
+hp_bar_last_update = 0
+
 #sfx
 gun_sound = pygame.mixer.Sound("sfx/arfire.mp3")
 shotgun_sound = pygame.mixer.Sound("sfx/shotgun.mp3")
