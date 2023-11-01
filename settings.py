@@ -101,7 +101,9 @@ class Level:
         self.tile_y = 0
 
     def update(self):
+        tile_rects.clear()
         self.tile_y = 0
+
         for row in self.terrain:
             self.tile_x = 0
 
