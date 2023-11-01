@@ -88,7 +88,6 @@ class Player:
         elif jumping == True and self.flip:
             self.image = pygame.transform.flip(jumping_bob, True, False)
 
-        print(jumping)
         display.blit(self.image, (self.rect.x - scroll[0], self.rect.y))
 
 #bullet class
@@ -142,7 +141,7 @@ class Bullet:
             self.rect.y += 2.5
 
         #removing bullet if outside of screen
-        if self.rect.x > screen_width or self.rect.x < 0:
+        if (self.rect.x > screen_width + scroll[0]) or (self.rect.x < 0 + scroll[0]):
             bullets.remove(self)
         for f in frogs:
             if self.rect.colliderect(f.rect):
