@@ -6,10 +6,10 @@ from settings import *
 pygame.init()
 
 class Player:
-    def __init__(self, x, y, speed):
+    def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.speed = speed
+        self.speed = player_speed
         self.image = idle_bob
         self.running = running_bob
         self.running_cooldown = running_bob_cooldown
@@ -18,10 +18,9 @@ class Player:
         self.flip = False
         self.rect = self.image.get_rect(topleft= (self.x, self.y))
         self.offset_x = self.rect.x
-        self.jumping = False
-        self.touching_ground = False
         self.jump_height = 15
         self.vel_y = 0
+        self.in_air = False
 
     def update(self):
         global gravity
@@ -30,6 +29,7 @@ class Player:
         key = pygame.key.get_pressed()
         #key d pressed
         if key[pygame.K_d] == 1:
+            self.speed = player_speed
             self.rect.x += self.speed  
             if jumping == False:
                 if current_time - self.running_last_update >= self.running_cooldown:
@@ -44,7 +44,8 @@ class Player:
                 
         #key a pressed
         elif key[pygame.K_a] == 1:
-            self.rect.x -= self.speed
+            self.speed = -player_speed
+            self.rect.x += self.speed
             if jumping == False:
                 #cooldown per frame
                 if current_time - self.running_last_update >= self.running_cooldown:
@@ -67,17 +68,30 @@ class Player:
             elif jumping == False:
                 self.image = idle_bob
             self.running_frame = 0
+            self.speed = 0
+
+        for t in tile_rects:
+            if t.colliderect(self.rect): 
+                if self.speed > 0:
+                    self.rect.right = t.left
+                if self.speed < 0:
+                    self.rect.left = t.right
 
         self.vel_y -= gravity
         self.rect.y -= self.vel_y
 
         for t in tile_rects:
-            if t.colliderect(self.rect):
-                self.rect.bottom = t.top
-                jumping = False
-                self.vel_y = 0
+            if t.colliderect(self.rect): 
+                if self.vel_y < 0:
+                    self.rect.bottom = t.top
+                    jumping = False
+                    self.in_air = False
+                    self.vel_y = 0        
 
-        if key[pygame.K_w] and not jumping:
+        if self.vel_y < 0:
+            self.in_air = True
+
+        if key[pygame.K_w] and not jumping and not self.in_air:
             self.vel_y = self.jump_height
             jumping = True
     
@@ -87,8 +101,8 @@ class Player:
         elif jumping == True and self.flip:
             self.image = pygame.transform.flip(jumping_bob, True, False)   
     
-
         display.blit(self.image, (self.rect.x - scroll[0], self.rect.y))
+
 
 #bullet class
 class Bullet:
@@ -292,7 +306,7 @@ music = False
 pause = False
 
 #player
-player = Player(player_x, player_y, player_speed)
+player = Player(player_x, player_y)
 
 #levels
 frog_forest = Level("platform.csv")
