@@ -42,8 +42,8 @@ eye_idle = get_image(eye_floating_sheet, 2, 60, 60, 3, (0, 0, 0))
 
 #Frog animations
 frog_animations = []
-for f in range(13):
-    frog_animations.append(get_image(frog_sheet, f, 106, 102, 1, (0, 0, 0)))
+for f in range(15):
+    frog_animations.append(get_image(frog_sheet, f, 60, 60, 2, (0, 0, 0)))
 
 #frog idle and damage
 frog_idle = frog_animations[0]
@@ -111,17 +111,18 @@ class Level:
 
             for tile in row:
                 if tile == "0":
-                    display.blit(tiles[0], (self.tile_x * tile_size - scroll[0], self.tile_y * tile_size + player_y + 56))
+                    display.blit(tiles[0], (self.tile_x * tile_size - scroll[0], self.tile_y * tile_size + player_y - screen_height + 150))
 
                 if tile == "5":
-                    display.blit(tiles[5], (self.tile_x * tile_size - scroll[0],  self.tile_y * tile_size + player_y + 56))
+                    display.blit(tiles[5], (self.tile_x * tile_size - scroll[0],  self.tile_y * tile_size + player_y - screen_height + 150))
 
-                tile_rects.append(pygame.Rect(self.tile_x * tile_size, self.tile_y * tile_size + player_y + 56, tile_size, tile_size))
+                if tile != "-1":
+                    tile_rects.append(pygame.Rect(self.tile_x * tile_size, self.tile_y * tile_size + player_y - screen_height + 150, tile_size, tile_size))
 
                 self.tile_x += 1
 
             self.tile_y += 1
-
+        
 
 
 

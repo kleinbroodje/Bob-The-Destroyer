@@ -82,11 +82,15 @@ class Player:
 
         for t in tile_rects:
             if t.colliderect(self.rect): 
+                if self.vel_y > 0:
+                    self.rect.top = t.bottom
+                    self.vel_y = 0
+
                 if self.vel_y < 0:
                     self.rect.bottom = t.top
                     jumping = False
                     self.in_air = False
-                    self.vel_y = 0        
+                    self.vel_y = 0 
 
         if self.vel_y < 0:
             self.in_air = True
@@ -157,6 +161,7 @@ class Bullet:
         #removing bullet if outside of screen
         if (self.rect.x > screen_width + scroll[0]) or (self.rect.x < 0 + scroll[0]):
             bullets.remove(self)
+            return
 
         for f in frogs:
             if self.rect.colliderect(f.rect):
@@ -164,9 +169,9 @@ class Bullet:
                 f.show_hp = True
                 hp_bar_last_update = current_time
                 bullets.remove(self)
+                 
 
-
-#Eyeball class
+#Eyeball class  
 class Eyeball:
     def __init__(self, x, y):
         self.idle_image = pygame.transform.flip(eye_idle, True, False)
@@ -214,7 +219,7 @@ class Frog:
         self.idle = frog_idle
         self.image = self.idle
         self.rect = self.idle.get_rect(topleft=(self.x, self.y))
-        self.rect = self.rect.inflate(-25, -32)       
+        self.rect = self.rect.inflate(-40, -55)    
         self.kill = frog_explosion
         self.kill_last_update = frog_kill_last_update
         self.kill_frame = frog_kill_frame
@@ -268,8 +273,8 @@ class Frog:
         if current_time - hp_bar_last_update >= 1000:  
             self.show_hp = False
 
-        display.blit(self.image, (self.rect.x -15 - scroll[0], self.rect.y - 15))
-        
+        display.blit(self.image, (self.rect.x -15 -scroll[0], self.rect.y - 25))
+
 
 class Platform:
     def __init__(self, x, y, width, height, color):
@@ -293,7 +298,7 @@ ar_cooldown = 100
 sg_cooldown = 1700
 
 #Frog
-frogs = [Frog(200, 463)]
+frogs = [Frog(200, 454)]
 
 #screenshake
 screenshake = 0
@@ -310,6 +315,7 @@ player = Player(player_x, player_y)
 
 #levels
 frog_forest = Level("platform.csv")
+amogus = Level("amogus.csv")
 
 #main loop
 clock = pygame.time.Clock()
@@ -399,7 +405,7 @@ while running:
     elif gun == "sg":
         display.blit(shotgun, (player.rect.x - scroll[0], player.rect.y + 22))
 
-    frog_forest.update()
+    amogus.update()
 
     for f in frogs:
         f.update() 
@@ -408,7 +414,7 @@ while running:
         b.update()
     
     if frogs == []:
-        frogs.append(Frog(random.randint(0, 640), 463))
+        frogs.append(Frog(random.randint(0, 640), 454))
 
     screen.blit(pygame.transform.scale(display, (screen_width, screen_height)), render_offset) #display is blitted on surface 
     pygame.display.update()
