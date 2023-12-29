@@ -24,6 +24,10 @@ guns_sheet = pygame.image.load("sprites/guns and ammo.png").convert()
 eye_floating_sheet = pygame.image.load("sprites/eye_floating.png").convert()
 frog_sheet = pygame.image.load("sprites/frog.png").convert()
 
+#hud bar
+hud_bar = pygame.image.load("sprites/hud_bar.png").convert_alpha()
+hud_bar = pygame.transform.scale(hud_bar, (300, 100))
+
 #function for getting frames from spritesheet
 def get_image(sheet, frame,  width, height, scale, colorkey):
     image = pygame.Surface((width, height))
@@ -38,7 +42,7 @@ jumping_bob = get_image(player_sheet, 7, 12, 14, 4, (0, 0, 0))
 assault_rifle = get_image(guns_sheet, 0, 27, 9, 2.5, (0, 0, 0))
 shotgun = get_image(guns_sheet, 1, 27, 9, 2.5, (0, 0, 0))
 bullet = get_image(guns_sheet, 2, 27, 9, 1, (0, 0, 0))
-eye_idle = get_image(eye_floating_sheet, 2, 60, 60, 3, (0, 0, 0))
+eye_idle = get_image(eye_floating_sheet, 2, 60, 60, 3.5, (0, 0, 0))
 
 #Frog animations
 frog_animations = []
@@ -47,6 +51,7 @@ for f in range(15):
 
 #frog idle and damage
 frog_idle = frog_animations[0]
+
 #frog croak
 frog_croak = frog_animations[5:7]  + frog_animations[5:6] + frog_animations[0:1]
 frog_croak_frame = 0
@@ -111,13 +116,13 @@ class Level:
 
             for tile in row:
                 if tile == "0":
-                    display.blit(tiles[0], (self.tile_x * tile_size - scroll[0], self.tile_y * tile_size + player_y - screen_height + 150))
+                    display.blit(tiles[0], (self.tile_x * tile_size - scroll[0], self.tile_y * tile_size + player_y - screen_height + 800))
 
                 if tile == "5":
-                    display.blit(tiles[5], (self.tile_x * tile_size - scroll[0],  self.tile_y * tile_size + player_y - screen_height + 150))
+                    display.blit(tiles[5], (self.tile_x * tile_size - scroll[0],  self.tile_y * tile_size + player_y - screen_height + 800))
 
                 if tile != "-1":
-                    tile_rects.append(pygame.Rect(self.tile_x * tile_size, self.tile_y * tile_size + player_y - screen_height + 150, tile_size, tile_size))
+                    tile_rects.append(pygame.Rect(self.tile_x * tile_size, self.tile_y * tile_size + player_y - screen_height + 800, tile_size, tile_size))
 
                 self.tile_x += 1
 

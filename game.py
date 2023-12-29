@@ -1,6 +1,5 @@
 import pygame
 import random
-import threading
 from settings import *
 
 pygame.init()
@@ -21,6 +20,9 @@ class Player:
         self.jump_height = 15
         self.vel_y = 0
         self.in_air = False
+        self.hp = 100
+        self.hp_bar = Healthbar(190, 10, self.hp, add_scroll=False)
+        self.hud = hud_bar
 
     def update(self):
         global gravity
@@ -104,7 +106,9 @@ class Player:
 
         elif jumping == True and self.flip:
             self.image = pygame.transform.flip(jumping_bob, True, False)   
-    
+
+        display.blit(self.hud, (5, 5))
+        self.hp_bar.draw(100, 40)
         display.blit(self.image, (self.rect.x - scroll[0], self.rect.y))
 
 
@@ -198,18 +202,19 @@ class Eyeball:
      
 
 class Healthbar:
-    def __init__(self, x, y, width, height, max_hp):
-        self.x = x
-        self.y = y
+    def __init__(self, width, height, max_hp, add_scroll=True):
         self.width = width
         self.height = height
         self.max_hp = max_hp
         self.hp = max_hp
+        self.scroll = add_scroll
     
-    def draw(self):
+    def draw(self, x, y):
+        self.x = x
+        self.y = y
         ratio = self.hp/self.max_hp
-        pygame.draw.rect(display, (255, 0, 0), (self.x - scroll[0], self.y, self.width, self.height))
-        pygame.draw.rect(display, (0, 128, 0), (self.x - scroll[0], self.y, self.width * ratio, self.height))  
+        pygame.draw.rect(display, (255, 0, 0), ((self.x - scroll[0] if self.scroll else self.x), self.y, self.width, self.height))
+        pygame.draw.rect(display, (0, 128, 0), ((self.x - scroll[0] if self.scroll else self.x), self.y, self.width * ratio, self.height))
 
 
 class Frog:
@@ -229,13 +234,56 @@ class Frog:
         self.croak_start = False
         self.croak_sound = False
         self.hp = 100
-        self.hp_bar = Healthbar(self.rect.x + 10, self.rect.y - 10, 60, 5, self.hp)
+        self.hp_bar = Healthbar(60, 5, self.hp)
         self.show_hp = False
+        self.vel_y = 20
+        self.speed = 0
+        self.movement_cooldown = True
+        self.start_movement_cooldown = 0
+        self.flip = False
 
-    def update(self):
+    def update(self): 
         global hp_bar_last_update
         global current_time
 
+        if self.rect.x < player.rect.x:
+            self.flip = True
+        else:
+            self.flip = False
+
+        if current_time - self.start_movement_cooldown >= 1000:
+            self.movement_cooldown = False 
+
+        if abs(player.rect.x - self.rect.x) < 500 and not self.movement_cooldown: 
+            if self.rect.x > player.rect.x:
+                self.speed = -2
+            elif self.rect.x < player.rect.x:
+                self.speed = 2
+            self.rect.x += self.speed
+
+        for t in tile_rects:
+            if t.colliderect(self.rect): 
+                if self.speed > 0:
+                    self.rect.right = t.left
+                if self.speed < 0:
+                    self.rect.left = t.right
+
+        if not self.movement_cooldown:
+            self.rect.y -= self.vel_y
+            self.vel_y -= 1
+            self.start_movement_cooldown = current_time
+
+        for t in tile_rects:
+            if t.colliderect(self.rect): 
+                if self.vel_y > 0:
+                    self.rect.top = t.bottom
+                    self.vel_y = 20
+
+                if self.vel_y < 0:
+                    self.rect.bottom = t.top
+                    self.vel_y = 20
+                self.movement_cooldown = True
+                
         croak = 0
         if croak != 1:
             croak = random.randint(0, 500)
@@ -268,27 +316,15 @@ class Frog:
                     frogs.remove(self)
 
         if self.show_hp:
-            self.hp_bar.draw() 
+            self.hp_bar.draw(self.rect.x + 10, self.rect.y - 10) 
 
         if current_time - hp_bar_last_update >= 1000:  
             self.show_hp = False
 
-        display.blit(self.image, (self.rect.x -15 -scroll[0], self.rect.y - 25))
-
-
-class Platform:
-    def __init__(self, x, y, width, height, color):
-        self.x = x
-        self.y = y
-        self.color = color
-        self.width = width
-        self.height = height
-        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-
-    def update(self):
-        pass
-    def draw(self):
-        pygame.draw.rect(display, self.color, ((self.rect.x - scroll[0]), self.rect.y, self.rect.width, self.rect.height))
+        if self.flip:
+            display.blit(pygame.transform.flip(self.image, True, False), (self.rect.x -15 -scroll[0], self.rect.y - 25))
+        else:
+            display.blit(self.image, (self.rect.x -15 -scroll[0], self.rect.y - 25))
 
 
 #bullets
@@ -393,19 +429,7 @@ while running:
         render_offset[0] = random.randint(-4, 4) 
         render_offset[1] = random.randint(-4, 4) 
 
-    player.update()
-
-        #guns left and right
-    if player.flip and gun == "ar":
-        display.blit(pygame.transform.flip(assault_rifle, True, False), (player.rect.x - 20 - scroll[0], player.rect.y + 17))
-    elif gun == "ar":
-        display.blit(assault_rifle, (player.rect.x - scroll[0], player.rect.y + 17))
-    if player.flip and gun == "sg":
-        display.blit(pygame.transform.flip(shotgun, True, False), (player.rect.x - 20 - scroll[0], player.rect.y + 22))
-    elif gun == "sg":
-        display.blit(shotgun, (player.rect.x - scroll[0], player.rect.y + 22))
-
-    amogus.update()
+    frog_forest.update()
 
     for f in frogs:
         f.update() 
@@ -415,6 +439,18 @@ while running:
     
     if frogs == []:
         frogs.append(Frog(random.randint(0, 640), 454))
+
+    player.update()
+
+    #guns left and right
+    if player.flip and gun == "ar":
+        display.blit(pygame.transform.flip(assault_rifle, True, False), (player.rect.x - 20 - scroll[0], player.rect.y + 17))
+    elif gun == "ar":
+        display.blit(assault_rifle, (player.rect.x - scroll[0], player.rect.y + 17))
+    if player.flip and gun == "sg":
+        display.blit(pygame.transform.flip(shotgun, True, False), (player.rect.x - 20 - scroll[0], player.rect.y + 22))
+    elif gun == "sg":
+        display.blit(shotgun, (player.rect.x - scroll[0], player.rect.y + 22))
 
     screen.blit(pygame.transform.scale(display, (screen_width, screen_height)), render_offset) #display is blitted on surface 
     pygame.display.update()
