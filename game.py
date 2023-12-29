@@ -238,9 +238,10 @@ class Frog:
         self.show_hp = False
         self.vel_y = 20
         self.speed = 0
-        self.movement_cooldown = True
+        self.movement_cooldown = False
         self.start_movement_cooldown = 0
         self.flip = False
+        self.rotation = 0
 
     def update(self): 
         global hp_bar_last_update
@@ -256,9 +257,9 @@ class Frog:
 
         if abs(player.rect.x - self.rect.x) < 500 and not self.movement_cooldown: 
             if self.rect.x > player.rect.x:
-                self.speed = -2
+                self.speed = -3
             elif self.rect.x < player.rect.x:
-                self.speed = 2
+                self.speed = 3
             self.rect.x += self.speed
 
         for t in tile_rects:
@@ -271,10 +272,17 @@ class Frog:
         if not self.movement_cooldown:
             self.rect.y -= self.vel_y
             self.vel_y -= 1
+            self.image = frog_jump[1]
+            self.image = pygame.transform.rotate(self.image, self.rotation)
+            self.rotation += 2
             self.start_movement_cooldown = current_time
 
         for t in tile_rects:
             if t.colliderect(self.rect): 
+                self.movement_cooldown = True
+                self.image = self.idle
+                self.rotation = 0
+                
                 if self.vel_y > 0:
                     self.rect.top = t.bottom
                     self.vel_y = 20
@@ -282,8 +290,7 @@ class Frog:
                 if self.vel_y < 0:
                     self.rect.bottom = t.top
                     self.vel_y = 20
-                self.movement_cooldown = True
-                
+
         croak = 0
         if croak != 1:
             croak = random.randint(0, 500)

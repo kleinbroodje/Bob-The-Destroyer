@@ -62,6 +62,9 @@ frog_explosion = frog_animations[1:5]
 frog_kill_frame = 0
 frog_kill_last_update = 0
 
+#frog jump animation
+frog_jump = frog_animations[13:15]
+
 #getting the frames, fps and last_update of the running animation for bob
 running_bob = []
 running_bob_cooldown = 65
