@@ -1,2 +1,7 @@
 [shotgun]
-offset = {x = 0, y = 0}
+weapon_type = "shotgun"
+bullet_type = "default"
+rotation = [37, 32]
+bullet_speed = 20
+spread = 15
+auto = false
