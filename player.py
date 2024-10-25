@@ -54,9 +54,10 @@ class Player:
             
     def process_event(self, event):
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE and not self.jumping:
+            if event.key == pygame.K_SPACE and not (self.jumping or self.rolling):
                 self.current_frame = 9
                 self.cape_current_frame = 10
+                self.has_run = False
                 self.rolling = True
 
     def update(self):
@@ -82,9 +83,9 @@ class Player:
 
         elif self.rolling:
             if self.flip:
-                self.rect.x -= 15
+                self.rect.x -= 10
             else:
-                self.rect.x += 15
+                self.rect.x += 10
 
             self.image = self.images[int(self.current_frame)]
             self.current_frame += 0.2
@@ -92,7 +93,7 @@ class Player:
             self.cape = self.cape_images[int(self.cape_current_frame)]
             self.cape_current_frame += 0.2
 
-            if self.current_frame >= 14 and self.cape_current_frame >= 15:
+            if self.current_frame >= 15 and self.cape_current_frame >= 16:
                 self.rolling = False 
             
         #run animation

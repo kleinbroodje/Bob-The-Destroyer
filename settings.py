@@ -62,4 +62,8 @@ def imgload(*path, columns=1, rows=1, scale=R):
             ret.append(row_sheet)
 
     return ret
-    
+
+
+def create_bloom(image, color, scale, rect):
+    surf = pygame.transform.scale_by(pygame.mask.from_surface(image).to_surface(setcolor=color), scale)
+    display.blit(surf, (rect.centerx - surf.width/2, rect.centery - surf.height/2), special_flags=pygame.BLEND_RGB_ADD)
