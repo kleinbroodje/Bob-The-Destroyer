@@ -1,8 +1,10 @@
 [shotgun]
 weapon_type = "shotgun"
 bullet_type = "default"
-rotation = [37, 32]
-bullet_speed = 25
+rotation = [10, 8]
+bullet_speed = 8
 bullet_damage = 20
+bullets_fired = 3
 spread = 10
 auto = false
+mag = 1

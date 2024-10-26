@@ -3,17 +3,18 @@ from weapon import *
 
 class Enemy:
     def __init__(self):
-        self.rect = pygame.Rect(uniform(0, WIDTH-96), 300, 96, 96)
+        self.rect = pygame.Rect(uniform(0, WIDTH-20), 130, 20, 20)
         self.color = (255, 255, 255)
         self.hp = 100
         self.last_attack = pygame.time.get_ticks()
+        self.attack_damage = 10
 
     def assign_player(self, player):
         self.player = player
 
     def attack(self):
-        projectile = Projectile(self.rect.centerx, self.rect.centery, self.player.rect.centerx, self.player.rect.bottom, radians(65))
-        projectiles.append(projectile)
+        projectile = Projectile(self.rect.centerx, self.rect.centery, self.player.rect.centerx, 50, self.attack_damage, 0)
+        enemy_projectiles.append(projectile)
         self.last_attack = pygame.time.get_ticks()
 
     def update(self):
@@ -30,7 +31,7 @@ class Enemy:
         if pygame.time.get_ticks() - self.last_attack > 1500:
             self.attack()
 
-        pygame.draw.rect(display, self.color, self.rect)
+        pygame.draw.rect(display, self.color, pygame.Rect(self.rect.x-scroll[0], self.rect.top-scroll[1], self.rect.width, self.rect.height))
         
 
 enemies = [Enemy(), Enemy()]

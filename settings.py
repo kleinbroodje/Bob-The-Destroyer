@@ -4,17 +4,21 @@ from pathlib import Path
 
 pygame.init()
 
-WIDTH, HEIGHT = 1280, 720
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-display = pygame.Surface((screen.width, screen.height)) 
+WIDTH, HEIGHT = 400, 225
+screen = pygame.display.set_mode((1280, 720))
+display = pygame.Surface((WIDTH, HEIGHT)) 
 pygame.display.set_caption("Bob The Destroyer")
-R = 3
+R = screen.width/WIDTH #scale 
+scroll = [0, 0]
+cooldown_bars = []
 
+font = [
+    pygame.font.Font(Path("assets", "Micro5-Regular.ttf"), i)
+    for i in range(101)
+]
 
-def imgload(*path, columns=1, rows=1, scale=R):
-    image = pygame.transform.scale_by(
-        pygame.image.load(Path(*path)).convert_alpha(), scale
-    )
+def imgload(*path, columns=1, rows=1):
+    image = pygame.image.load(Path(*path)).convert_alpha()
      
     if columns * rows == 1: 
         return image
@@ -67,3 +71,23 @@ def imgload(*path, columns=1, rows=1, scale=R):
 def create_bloom(image, color, scale, rect):
     surf = pygame.transform.scale_by(pygame.mask.from_surface(image).to_surface(setcolor=color), scale)
     display.blit(surf, (rect.centerx - surf.width/2, rect.centery - surf.height/2), special_flags=pygame.BLEND_RGB_ADD)
+
+
+class CooldownBar:
+    def __init__(self, color, cooldown, label):
+        self.max_bar = pygame.Rect(40, 0, 25, 6)
+        self.bar = self.max_bar.copy()
+        self.color = color
+        self.label = label
+        self.cooldown = cooldown
+        self.last_time = 0
+
+    def update(self, time):
+        r = (time-self.last_time)/self.cooldown
+        self.bar.width = self.max_bar.width - self.max_bar.width * r
+        if self.bar.width <= 0:
+            cooldown_bars.remove(self)
+
+        display.blit(font[10].render(self.label, False, (255, 255, 255)), (self.bar.x - 30, self.bar.y-self.bar.height/2))
+        pygame.draw.rect(display, self.color, self.bar)
+
