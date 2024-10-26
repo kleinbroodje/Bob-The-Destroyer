@@ -56,7 +56,7 @@ class Weapon:
 
     def update(self, x, y):
         mouse_pos = pygame.mouse.get_pos()
-        self.angle = degrees(atan2(-(mouse_pos[1]/R-y-scroll[1]), mouse_pos[0]/R-x+scroll[0]))
+        self.angle = degrees(atan2(-(mouse_pos[1]/R-y+scroll[1]), mouse_pos[0]/R-x+scroll[0]))
 
         if self.angle > 90 or self.angle < -90:
             image = pygame.transform.flip(self.image, True, False)
@@ -84,6 +84,11 @@ class Bullet:
     def update(self):
         self.rect.x += self.vel_x
         self.rect.y -= self.vel_y
+
+        for t in basic_map.tiles:
+            if t.rect.colliderect(self.rect): 
+                if self in bullets:
+                    bullets.remove(self)
 
         if self.rect.centerx-scroll[0] > WIDTH or self.rect.centerx-scroll[0] < 0 or self.rect.centery > HEIGHT or self.rect.centery < 0:
             if self in bullets:
@@ -118,10 +123,16 @@ class Projectile:
         #self.vel_y = abs(v)*sin(angle)
 
     def update(self):
+        self.rect.x += self.vel_x
+
         self.vel_y -= self.gravity
         self.rect.y -= self.vel_y
 
-        self.rect.x += self.vel_x
+        for t in basic_map.tiles:
+            if t.rect.colliderect(self.rect): 
+                if self in enemy_projectiles:
+                    enemy_projectiles.remove(self)
+
 
         if self.rect.centerx-scroll[0] > WIDTH or self.rect.centerx-scroll[0] < 0 or self.rect.centery > 396:
             if self in enemy_projectiles:

@@ -1,21 +1,23 @@
 import pygame
 from pathlib import Path
+from csv import reader
 
 
 pygame.init()
 
 WIDTH, HEIGHT = 400, 225
 screen = pygame.display.set_mode((1280, 720))
+ui_display = pygame.Surface((1280, 720))
 display = pygame.Surface((WIDTH, HEIGHT)) 
 pygame.display.set_caption("Bob The Destroyer")
 R = screen.width/WIDTH #scale 
 scroll = [0, 0]
 cooldown_bars = []
-
 font = [
     pygame.font.Font(Path("assets", "Micro5-Regular.ttf"), i)
     for i in range(101)
 ]
+
 
 def imgload(*path, columns=1, rows=1):
     image = pygame.image.load(Path(*path)).convert_alpha()
@@ -53,7 +55,6 @@ def imgload(*path, columns=1, rows=1):
             row = image.subsurface(
                 0, i * frame_height, image.get_width(), frame_height
             )
-            row_sheet = []
             for j in range(columns):
                 frame = row.subsurface(
                     j * frame_width,
@@ -61,10 +62,7 @@ def imgload(*path, columns=1, rows=1):
                     frame_width,
                     frame_height,
                 )
-                row_sheet.append(frame)
-
-            ret.append(row_sheet)
-
+                ret.append(frame)
     return ret
 
 
@@ -73,9 +71,64 @@ def create_bloom(image, color, scale, rect):
     display.blit(surf, (rect.centerx - surf.width/2, rect.centery - surf.height/2), special_flags=pygame.BLEND_RGB_ADD)
 
 
+
+class Tile:
+    def __init__(self, image, x, y):
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
+
+
+class TileMap:
+    def __init__(self, path):
+        self.tile_size = 16
+        self.tiles = self.load_tiles(path)
+        self.map_surface = pygame.Surface((self.map_w, self.map_h)).convert()
+        self.map_surface.set_colorkey((0, 0, 0))
+        self.load_map()
+
+    def read_csv(self, path):
+        with open(path) as data:
+            map_ = []
+            data = reader(data, delimiter=",")
+            for row in data:
+                map_.append(list(row))
+        return map_
+    
+    def load_map(self):
+        for tile in self.tiles:
+            tile.draw(self.map_surface)
+
+    def load_tiles(self, path):
+        tiles = []
+        map_ = self.read_csv(path)
+        x, y = 0, 0
+        for row in map_:
+            x = 0
+            for tile in row:
+                if tile != "-1":
+                    tiles.append(Tile(tile_images[int(tile)], x * self.tile_size, y * self.tile_size))
+                x += 1
+            y += 1
+        self.map_w = x * self.tile_size
+        self.map_h = y * self.tile_size
+        return tiles
+
+    def update(self):
+        display.blit(self.map_surface, (0-scroll[0], 0-scroll[1]))
+
+
+tile_images = imgload("assets", "tileset.png", columns=5, rows=3)
+basic_map = TileMap(Path("assets", "basic_map.csv"))
+
+
 class CooldownBar:
     def __init__(self, color, cooldown, label):
-        self.max_bar = pygame.Rect(40, 0, 25, 6)
+        self.max_bar = pygame.Rect(45, 0, 25, 6)
         self.bar = self.max_bar.copy()
         self.color = color
         self.label = label
@@ -88,6 +141,6 @@ class CooldownBar:
         if self.bar.width <= 0:
             cooldown_bars.remove(self)
 
-        display.blit(font[10].render(self.label, False, (255, 255, 255)), (self.bar.x - 30, self.bar.y-self.bar.height/2))
+        ui_display.blit(font[40].render(self.label, False, (255, 255, 255)), ((self.bar.x - 40)*R, (self.bar.y-self.bar.height/2)*R))
         pygame.draw.rect(display, self.color, self.bar)
 

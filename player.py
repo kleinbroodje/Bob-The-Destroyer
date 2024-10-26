@@ -28,6 +28,7 @@ class Player:
         self.vel_y = 0
         self.mjump = 8
         self.gravity = 0.5
+        self.jumping = False
         self.has_jumped = False
 
         #weapons
@@ -43,13 +44,15 @@ class Player:
     def keys(self):
         keys = pygame.key.get_pressed()
         self.running = False
+
         if not self.rolling:
+            self.speed = 0
             if keys[pygame.K_a]:
-                self.rect.x -= self.speed
+                self.speed = -3
                 self.running = True
                 self.flip = True
             if keys[pygame.K_d]:
-                self.rect.x += self.speed
+                self.speed = 3
 
                 #added this so you can't run in place
                 if self.running:
@@ -58,7 +61,7 @@ class Player:
                     self.running = True
                 
                 self.flip = False
-            if keys[pygame.K_w] and not self.jumping:
+            if keys[pygame.K_w] and not (self.in_air or self.jumping):
                 self.cape_current_frame = 6
                 self.jumping = True
                 self.vel_y = self.mjump
@@ -80,14 +83,13 @@ class Player:
                     self.weapon.shoot()
 
     def idle_animation(self):
-        self.current_frame = 1
+        self.current_frame = 0
         self.image = self.images[0]
         
         if self.has_run or self.has_jumped:
             if self.cape_cooldown <= 0:
                 self.has_run = False
                 self.has_jumped = False
-                self.cape_current_frame = 1
                 self.cape_cooldown = 1
             self.cape = self.cape_images[1]
             self.cape_cooldown -= 0.45
@@ -129,28 +131,51 @@ class Player:
     def update(self):
         self.keys()
 
+        #collision
         for enemy_projectile in enemy_projectiles:
             if not self.rolling:
                 if self.rect.colliderect(enemy_projectile.rect):
                     self.hp -= enemy_projectile.damage
                     enemy_projectiles.remove(enemy_projectile)
 
+        self.rect.x += self.speed
+
+        for t in basic_map.tiles:
+            if self.rect.colliderect(t.rect): 
+                if self.speed > 0:
+                    self.rect.right = t.rect.left
+                if self.speed < 0:
+                    self.rect.left = t.rect.right
+
+        self.rect.y -= self.vel_y
+        self.vel_y -= self.gravity
+
+        for t in basic_map.tiles:
+            if self.rect.colliderect(t.rect): 
+                if self.vel_y > 0:
+                    self.rect.top = t.rect.bottom
+                    self.vel_y = 0
+
+                if self.vel_y < 0:
+                    self.rect.bottom = t.rect.top
+                    self.vel_y = 0
+                    self.in_air = False
+                    if self.jumping:
+                        self.jumping = False
+                        self.has_jumped = True
+
+        #states
+        if self.vel_y < 0:
+            self.in_air = True            
+
         if self.jumping:
-            self.rect.y -= self.vel_y
-            self.vel_y -= self.gravity
-
             self.jump_animation()
-
-            if self.rect.y >= 120:
-                self.vel_y = 0
-                self.jumping = False
-                self.has_jumped = True
 
         elif self.rolling:
             if self.flip:
-                self.rect.x -= self.roll_speed
+                self.speed = -self.roll_speed
             else:
-                self.rect.x += self.roll_speed
+                self.speed = self.roll_speed
 
             self.rolling_animation()
 
@@ -170,9 +195,10 @@ class Player:
             self.image = pygame.transform.flip(self.image, True, False)
             self.cape = pygame.transform.flip(self.cape, True, False)
         
+        #rendering
         #lower cape by R pixels when bopping
         if self.bop:
-            display.blit(self.cape, ((self.rect.x - 21)-scroll[0], (self.rect.y - 17)-scroll[1]))
+            display.blit(self.cape, ((self.rect.x - 21)-scroll[0], (self.rect.y - 15)-scroll[1]))
         else:
             display.blit(self.cape, ((self.rect.x - 21)-scroll[0], (self.rect.y - 16)-scroll[1]))
 

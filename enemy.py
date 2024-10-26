@@ -8,6 +8,8 @@ class Enemy:
         self.hp = 100
         self.last_attack = pygame.time.get_ticks()
         self.attack_damage = 10
+        self.gravity = 1
+        self.vel_y = 0
 
     def assign_player(self, player):
         self.player = player
@@ -18,6 +20,19 @@ class Enemy:
         self.last_attack = pygame.time.get_ticks()
 
     def update(self):
+        self.rect.y -= self.vel_y
+        self.vel_y -= self.gravity
+
+        for t in basic_map.tiles:
+            if t.rect.colliderect(self.rect): 
+                if self.vel_y > 0:
+                    self.rect.top = t.rect.bottom
+                    self.vel_y = 0
+
+                if self.vel_y < 0:
+                    self.rect.bottom = t.rect.top
+                    self.vel_y = 0
+
         self.color = (255, 255, 255)
         for bullet in bullets:
             if self.rect.colliderect(bullet.rect):
