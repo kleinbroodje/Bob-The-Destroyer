@@ -1,9 +1,17 @@
-from player import *
-from enemy import *
+from src.player import *
+from src.enemy import *
+from src.tilemap import *
+from src.weapon import *
+from src.settings import *
 
 
 for enemy in enemies:
     enemy.assign_player(player)
+
+pygame.mouse.set_visible(False)
+cursor = imgload("assets", "images", "cursor.png")
+cursor_rect = cursor.get_rect()
+
 
 def main():
     clock = pygame.time.Clock()
@@ -21,7 +29,6 @@ def main():
             enemy.assign_player(player)
             enemies.append(enemy)
 
-        #input
         for event in pygame.event.get():
             player.process_event(event)
 
@@ -32,7 +39,6 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     running = False  
 
-        #update      
         basic_map.update()
 
         cooldown_bar_y = 20
@@ -52,7 +58,11 @@ def main():
 
         player.update()
 
-        #render
+        cursor_rect.center = pygame.mouse.get_pos()
+        cursor_rect.centerx /= R
+        cursor_rect.centery /= R
+        display.blit(cursor, cursor_rect)
+
         ui_display.blit(font[40].render(f"{int(clock.get_fps())}", False, (255, 255, 255)), (10, 5))
         #ui_display.blit(font[40].render(f"{player.hp}", False, (255, 255, 255)), (((player.rect.x-scroll[0])*R), ((player.rect.y-scroll[1])*R)))
 

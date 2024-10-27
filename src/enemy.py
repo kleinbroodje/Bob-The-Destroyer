@@ -1,4 +1,5 @@
-from weapon import *
+from .weapon import *
+from .tilemap import *
 
 
 class Enemy:

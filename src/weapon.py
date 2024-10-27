@@ -2,7 +2,8 @@ import tomllib
 from random import uniform
 from math import atan2, cos, sin, tan, degrees, radians, sqrt
 
-from settings import *
+from .settings import *
+from .tilemap import *
 
 
 bullets = []
@@ -12,7 +13,7 @@ enemy_projectiles = []
 class Weapon:
     def __init__(self, name):
         self.name = name
-        self.image = imgload("assets", f"{self.name}.png")
+        self.image = imgload("assets", "images", f"{self.name}.png")
         self.rect = self.image.get_rect()
         self.width = self.rect.width
         self.weapon_type = weapon_data[self.name]["weapon_type"]
@@ -73,7 +74,7 @@ class Bullet:
     def __init__(self, x, y, bullet_type, damage, angle, speed, spread):
         self.bullet_type = bullet_type
         self.angle = angle + uniform(-spread, spread)
-        self.image = imgload("assets", f"{self.bullet_type}_bullet.png")
+        self.image = imgload("assets", "images", f"{self.bullet_type}_bullet.png")
         self.image = pygame.transform.rotate(self.image, self.angle)
         self.rect = self.image.get_rect()
         self.rect.center = x, y
@@ -90,7 +91,7 @@ class Bullet:
                 if self in bullets:
                     bullets.remove(self)
 
-        if self.rect.centerx-scroll[0] > WIDTH or self.rect.centerx-scroll[0] < 0 or self.rect.centery > HEIGHT or self.rect.centery < 0:
+        if self.rect.centerx-scroll[0] > WIDTH or self.rect.centerx-scroll[0] < 0 or self.rect.centery-scroll[1] > HEIGHT or self.rect.centery-scroll[1] < 0:
             if self in bullets:
                 bullets.remove(self)
 
@@ -141,7 +142,7 @@ class Projectile:
         pygame.draw.rect(display, (255, 0, 255), pygame.Rect(self.rect.x-scroll[0], self.rect.top-scroll[1], self.rect.width, self.rect.height))
 
 
-with open("weapons.toml", "rb") as f:
+with open(Path("src", "weapons.toml"), "rb") as f:
     weapon_data = tomllib.load(f)
     weapons = {}
     for k in weapon_data.keys():

@@ -1,4 +1,5 @@
-from weapon import *
+from .weapon import *
+from .tilemap import *
 
 
 class Player:
@@ -7,14 +8,14 @@ class Player:
         self.hp = 100
 
         #player animation
-        self.images = imgload("assets", "bob_spritesheet.png", columns=15)
+        self.images = imgload("assets", "images", "bob_spritesheet.png", columns=15)
         self.image = self.images[0]
         self.current_frame = 0
         self.flip = False
         self.bop = False
 
         #cape animation
-        self.cape_images = imgload("assets", "cape_spritesheet.png", columns=16)
+        self.cape_images = imgload("assets", "images", "cape_spritesheet.png", columns=16)
         self.cape = self.cape_images[0]
         self.cape_current_frame = 0
         self.cape_cooldown = 1
@@ -57,6 +58,7 @@ class Player:
                 #added this so you can't run in place
                 if self.running:
                     self.running = False
+                    self.speed = 0
                 else:
                     self.running = True
                 
