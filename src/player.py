@@ -4,7 +4,7 @@ from .tilemap import *
 
 class Player:
     def __init__(self):
-        self.rect = pygame.Rect(100, 120, 22, 32)
+
         self.hp = 100
 
         #player animation

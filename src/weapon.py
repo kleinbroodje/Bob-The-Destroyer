@@ -97,7 +97,7 @@ class Bullet:
 
         #pygame.draw.rect(display, (255, 0, 0), self.rect, 2)
         if self.bullet_type == "default":
-            create_bloom(self.image, (20, 20, 15), 2, pygame.Rect(self.rect.x-scroll[0], self.rect.top-scroll[1], self.rect.width, self.rect.height))
+            create_bloom(self.image, (10, 10, 5), 2, pygame.Rect(self.rect.x-scroll[0], self.rect.top-scroll[1], self.rect.width, self.rect.height))
         display.blit(self.image, (self.rect.x-scroll[0], self.rect.y-scroll[1]))
 
 

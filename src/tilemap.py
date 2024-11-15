@@ -53,5 +53,5 @@ class TileMap:
         display.blit(self.map_surface, (0-scroll[0], 0-scroll[1]))
 
 
-tile_images = imgload("assets", "images", "tileset.png", columns=5, rows=3)
+tile_images = imgload("assets", "images", "tileset.png", columns=8, rows=3)
 basic_map = TileMap(Path("assets", "tilemaps", "basic_map.csv"))

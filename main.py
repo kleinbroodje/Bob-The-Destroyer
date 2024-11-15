@@ -25,7 +25,7 @@ def main():
         scroll[1] +=(player.rect.y-scroll[1]-HEIGHT/2+player.rect.height/2)/20
 
         if len(enemies) < 2:
-            enemy = Enemy()
+            enemy = Slime()
             enemy.assign_player(player)
             enemies.append(enemy)
 
